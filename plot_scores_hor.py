@@ -40,7 +40,8 @@ if num_surveys == 0:
     exit()
 
 # Create a figure with subplots (side-by-side)
-fig, axes = plt.subplots(nrows=1, ncols=num_surveys, figsize=(5 * num_surveys, 5), sharey=False) # Adjusted figsize, sharey=False
+# Adjusted figsize for narrower and taller individual plots (e.g., each ~4 wide, 6 tall)
+fig, axes = plt.subplots(nrows=1, ncols=num_surveys, figsize=(3 * num_surveys, 7), sharey=False)
 if num_surveys == 1: # Ensure axes is always an array-like for consistent indexing
     axes = [axes]
 
@@ -76,6 +77,8 @@ for i, survey_name in enumerate(survey_names):
         legend=False # Remove legend
     )
 
+    ax.margins(0.4) # Add 10% margin to both x and y axes within this subplot
+
     ax.set_title(f'{survey_name}')
     ax.set_xticks([0, 4]) # Set x-axis ticks to only 0 and 4
     
@@ -96,7 +99,8 @@ for i, survey_name in enumerate(survey_names):
 # Add a main title to the figure
 fig.suptitle('Patient Scores: Start (FU 0) vs. End (FU 4) by Survey', fontsize=16)
 
-plt.tight_layout(rect=[0, 0, 1, 0.95]) # Adjust rect for suptitle
+# Adjust subplot parameters for better spacing and to accommodate suptitle
+fig.subplots_adjust(left=0.07, right=0.97, bottom=0.15, top=0.90, wspace=0.35)
 
 # Save the combined plot
 combined_plot_filename = "all_surveys_start_end_plot.png"
@@ -104,4 +108,4 @@ plt.savefig(combined_plot_filename)
 print(f"Combined plot saved as {combined_plot_filename}")
 plt.close(fig)
 
-print("\nStart-to-end plot generated.") 
+print("\nStart-to-end plot generated with adjusted aesthetics and margins.") 

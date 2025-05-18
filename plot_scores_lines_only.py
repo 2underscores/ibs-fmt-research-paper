@@ -47,39 +47,26 @@ for i, survey_name in enumerate(survey_names):
         ['patient_number', 'follow_up_number', 'patient_fmt_or_p']
     )['score'].sum().reset_index()
 
-    # Plot individual points and calculate statistics for each treatment
+    # Plot lines and error bars for each treatment
     for treatment in ['FMT', 'PLACEBO']:
         treatment_data = patient_scores_over_time[patient_scores_over_time['patient_fmt_or_p'] == treatment]
         
-        # Plot individual points
-        ax.scatter(
-            treatment_data['follow_up_number'],
-            treatment_data['score'],
-            color=color_mapping[treatment],
-            alpha=0.6,  # Slightly transparent
-            label=f'{treatment} Patients'
-        )
-
         # Calculate statistics for this treatment
         stats = treatment_data.groupby('follow_up_number')['score'].agg([
             'mean',
             'std'
         ]).reset_index()
 
-        # Plot mean line
-        ax.plot(stats['follow_up_number'], 
-                stats['mean'], 
-                color=color_mapping[treatment], 
-                linewidth=2, 
-                label=f'{treatment} Mean')
-
-        # Plot standard deviation range
-        ax.fill_between(stats['follow_up_number'],
-                        stats['mean'] - stats['std'],
-                        stats['mean'] + stats['std'],
-                        color=color_mapping[treatment],
-                        alpha=0.2,
-                        label=f'{treatment} ±1 SD')
+        # Plot mean line with error bars
+        ax.errorbar(stats['follow_up_number'], 
+                   stats['mean'],
+                   yerr=stats['std'],
+                   color=color_mapping[treatment],
+                   linewidth=2,
+                   capsize=5,  # Length of error bar caps
+                   capthick=2,  # Thickness of error bar caps
+                   elinewidth=2,  # Thickness of error bar lines
+                   label=f'{treatment} Mean ±1 SD')
 
     ax.set_title(f'Scores for {survey_name}')
     ax.set_ylabel('Total Score')
@@ -93,7 +80,7 @@ for i, survey_name in enumerate(survey_names):
 axes[-1].set_xlabel('Follow Up Number')
 
 # Add a main title to the figure
-fig.suptitle('Patient Scores Over Time by Survey and Treatment', fontsize=16)
+fig.suptitle('Mean Scores Over Time by Survey and Treatment', fontsize=16)
 
 # Adjust layout to make space for legends and suptitle
 plt.tight_layout(rect=[0, 0, 0.90, 0.96]) 
@@ -103,7 +90,7 @@ import os
 os.makedirs('results', exist_ok=True)
 
 # Save the combined plot
-combined_plot_filename = "results/all_surveys_scores_with_avg_plot.png"
+combined_plot_filename = "results/all_surveys_scores_lines_only.png"
 plt.savefig(combined_plot_filename)
 print(f"Combined plot saved as {combined_plot_filename}")
 plt.close(fig) # Close the figure to free memory

@@ -103,7 +103,7 @@ fig.suptitle('Patient Scores: Start (FU 0) vs. End (FU 4) by Survey', fontsize=1
 fig.subplots_adjust(left=0.07, right=0.97, bottom=0.15, top=0.90, wspace=0.35)
 
 # Save the combined plot
-combined_plot_filename = "all_surveys_start_end_plot.png"
+combined_plot_filename = "results/all_surveys_start_end_plot.png"
 plt.savefig(combined_plot_filename)
 print(f"Combined plot saved as {combined_plot_filename}")
 plt.close(fig)

@@ -1,3 +1,7 @@
 **/*.csv
 
 .venv/
+
+.DS_Store
+
+results/old/**/*

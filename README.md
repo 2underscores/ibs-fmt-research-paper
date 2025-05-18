@@ -1,35 +1,96 @@
-# Summary
-Poo from one place to another.
+# IBS Patient Study: FMT Treatment Analysis
 
-# AI Prompt
-## Background
-I am a research student writing a paper on the effects if FMT (fecal microbiota transplant).
+This repository contains code for analyzing the effects of Fecal Microbiota Transplant (FMT) treatment on IBS patients, comparing outcomes between FMT and placebo groups.
 
-I am doing a study where i get around 20 patients with IBS to undergo FMT treatment over the course of 5 sessions (an initial session and 4 follow ups).
+## Project Overview
 
-Some of the patients are given real FMT, others are given a placebo. Each session the patients complete 3 surveys (DASS, IBS-QoL and IBS-SSS) to record how they are feeling about their IBS and different attributes of it. The survey results are turned into scores. 
+This study investigates the effectiveness of FMT treatment for IBS patients through a controlled trial with the following characteristics:
+- Approximately 20 patients with IBS
+- 5 sessions per patient (1 initial + 4 follow-ups)
+- Two treatment groups: FMT and placebo
+- Three surveys administered at each session:
+  - DASS (Depression, Anxiety, and Stress Scale)
+  - IBS-QoL (IBS Quality of Life)
+  - IBS-SSS (IBS Symptom Severity Score)
 
-I am looking to see if the FMT performs better than the placebo in helping patients decrease their scores or do not perform differently to the placebo.
+## Data Structure
 
-## Data
-In the file ibs-all-patients-flat-scores.csv you will find the data in tablular form, with each row representing patients answer/score on a single question, from a single survey, on a single session.
+The main data file `data/ibs-all-patients-flat-scores.csv` contains the following columns:
+- `survey_name`: Survey type (DASS, IBS-QoL, IBS-SSS)
+- `q_number`: Question number within the survey
+- `q_id`: Unique question ID across all surveys
+- `q_category`: Question category for granular scoring
+- `patient_number`: Patient identifier (HC01-HC21)
+- `patient_fmt_or_placebo`: Treatment group (FMT or placebo)
+- `follow_up_number`: Session number (0-4, where 0 is initial)
+- `answer`: Patient's response
+- `score`: Numerical score for the response
 
-Description of each header:
-- survey_name: Which of the three surveys the question is from
-- q_number: Number of question in that survey
-- q_id: ID of question, unique across all surveys
-- q_category: Category of question, for more granular scores
-- patient_number: ID of patient HC01 to HC21
-- patient_fmt_or_placebo: Whether patient was on FMT or placebo
-- follow_up_number: Which session patient was on. 0 being first, 4 being last.
-- answer: What they answered to the question
-- score: The score given to that answer
+Additional reference files:
+- `all-survey-questions`: Complete list of survey questions
+- `patient-fmt-or-placebo`: Patient treatment group assignments
 
-Additionally there are two other files:
-- all-survey-questions: Reference list of all questions from all surveys
-- patient-fmt-or-placebo: List of patients and if they are on FMT or placebo
+## Analysis Scripts
 
-Both these are included in every row of the ibs-all-patients-flat-scores.csv file, however they are duplicated on every row and these two files are just normalised versions of that specific data (per patient and per survey data).
+### 1. Wilcoxon Test Analysis (`perform_wilcoxon_tests.py`)
+Performs Wilcoxon signed rank tests to compare baseline and follow-up scores for each:
+- Survey type
+- Treatment group
+- Follow-up session
 
-## My Task
-I need to make some nice looking graphs for my research paper and also perform the Wilcoxon signed rank test to see if FMT is having an impact greater than the placebo.
+Outputs:
+- HTML report with formatted results table
+- CSV file with raw test results
+
+### 2. Data Verification (`check_wilcoxon_data.py`)
+Utility script to verify Wilcoxon test results by examining specific cases in detail.
+
+## Results
+
+The analysis reveals:
+1. Significant improvement (p < 0.05) in:
+   - IBS-QoL scores for placebo group at follow-up 1 (p = 0.031)
+
+2. Notable trends:
+   - Most changes were not statistically significant
+   - Sample sizes range from 4-7 patients per group
+   - Follow-up 4 groups have smaller sample sizes (4 patients)
+
+## Requirements
+
+Required Python packages:
+- pandas
+- numpy
+- scipy
+- jinja2
+
+Install dependencies:
+```bash
+pip install pandas numpy scipy jinja2
+```
+
+## Usage
+
+1. Ensure data files are in the `data/` directory
+2. Run the analysis:
+```bash
+python perform_wilcoxon_tests.py
+```
+3. View results in:
+   - `results/wilcoxon_test_results.html`
+   - `results/wilcoxon_test_results.csv`
+
+## Project Structure
+```
+.
+├── data/
+│   ├── ibs-all-patients-flat-scores.csv
+│   ├── all-survey-questions
+│   └── patient-fmt-or-placebo
+├── results/
+│   ├── wilcoxon_test_results.html
+│   └── wilcoxon_test_results.csv
+├── perform_wilcoxon_tests.py
+├── check_wilcoxon_data.py
+└── README.md
+```

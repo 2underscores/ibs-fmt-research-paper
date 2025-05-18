@@ -1,5 +1,9 @@
+# Summary
+Poo from one place to another.
+
+# AI Prompt
 ## Background
-I am a research student writing a paper on the effects if FMT (fecal matter transplant).
+I am a research student writing a paper on the effects if FMT (fecal microbiota transplant).
 
 I am doing a study where i get around 20 patients with IBS to undergo FMT treatment over the course of 5 sessions (an initial session and 4 follow ups).
 

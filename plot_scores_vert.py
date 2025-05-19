@@ -42,7 +42,7 @@ num_surveys = len(survey_names)
 
 # Create a figure with subplots
 # Adjust figsize: width 12, height 5 per subplot
-fig, axes = plt.subplots(nrows=num_surveys, ncols=1, figsize=(12, 5 * num_surveys), sharex=True)
+fig, axes = plt.subplots(nrows=num_surveys, ncols=1, figsize=(12, 5 * num_surveys))
 if num_surveys == 1: # Ensure axes is always a list for consistent indexing
     axes = [axes]
 
@@ -84,13 +84,11 @@ for i, survey_name in enumerate(survey_names):
     # Set x-axis ticks every 2 months from 0 to 12
     ax.set_xticks(np.arange(0, 13, 2))
     ax.set_xlim(-0.5, 12.5)  # Add small padding on both sides
+    ax.set_xlabel('Months')  # Add x-axis label to all subplots
     
     # Adjust legend position to avoid overlap with the plot
     # Title for the legend combines patient and treatment info
     ax.legend(title='Patient / Treatment', bbox_to_anchor=(1.02, 1), loc='upper left')
-
-# Set common X-axis label on the last subplot
-axes[-1].set_xlabel('Months After Treatment')
 
 # Add a main title to the figure
 fig.suptitle('Patient Scores Over Time by Survey and Treatment', fontsize=16)

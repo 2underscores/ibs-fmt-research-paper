@@ -100,9 +100,9 @@ for i, survey_name in enumerate(survey_names):
         ax.set_ylabel('')
 
     if num_surveys > 1 and i == num_surveys // 2:
-        ax.set_xlabel('Months After Treatment')  # Updated label
+        ax.set_xlabel('Months')  # Updated label
     elif num_surveys == 1:
-        ax.set_xlabel('Months After Treatment')  # Updated label
+        ax.set_xlabel('Months')  # Updated label
     else:
         ax.set_xlabel('')
 

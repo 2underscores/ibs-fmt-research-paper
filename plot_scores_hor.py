@@ -109,12 +109,24 @@ for i, survey_name in enumerate(survey_names):
 # Add a main title to the figure
 fig.suptitle('Patient Scores: Baseline (0 months) vs. End (12 months) by Survey', fontsize=16)  # Updated title
 
-# Adjust subplot parameters for better spacing and to accommodate suptitle
-fig.subplots_adjust(left=0.07, right=0.97, bottom=0.15, top=0.90, wspace=0.35)
+# Create a custom legend for just FMT vs Placebo
+# Create dummy lines for the legend
+fmt_line = plt.Line2D([0], [0], color='gray', linestyle='-', label='FMT')
+placebo_line = plt.Line2D([0], [0], color='gray', linestyle='--', label='Placebo')
+
+# Add the figure-level legend
+fig.legend([fmt_line, placebo_line], ['FMT', 'Placebo'],
+          loc='center', 
+          bbox_to_anchor=(0.5, 0.02),
+          ncol=2,
+          title='Treatment Type')
+
+# Adjust subplot parameters for better spacing and to accommodate suptitle and legend
+fig.subplots_adjust(left=0.07, right=0.97, bottom=0.25, top=0.90, wspace=0.35)
 
 # Save the combined plot
 combined_plot_filename = "results/all_surveys_start_end_plot.png"
-plt.savefig(combined_plot_filename)
+plt.savefig(combined_plot_filename, bbox_inches='tight')
 print(f"Combined plot saved as {combined_plot_filename}")
 plt.close(fig)
 

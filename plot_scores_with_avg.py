@@ -24,6 +24,18 @@ df['patient_number'] = df['patient_number'].astype(str)
 # Ensure patient_fmt_or_p is string and uppercase for consistent mapping
 df['patient_fmt_or_p'] = df['patient_fmt_or_p'].astype(str).str.upper()
 
+# Create mapping from follow-up number to months
+follow_up_to_months = {
+    0: 0,   # baseline
+    1: 1,   # 1 month
+    2: 3,   # 3 months
+    3: 6,   # 6 months
+    4: 12   # 12 months
+}
+
+# Add months column to dataframe
+df['months'] = df['follow_up_number'].map(follow_up_to_months)
+
 # Get unique survey names
 survey_names = sorted(df['survey_name'].unique()) # Sort for consistent order
 num_surveys = len(survey_names)
@@ -35,7 +47,7 @@ if num_surveys == 1: # Ensure axes is always a list for consistent indexing
     axes = [axes]
 
 # Define colors for treatments
-color_mapping = {'FMT': 'green', 'PLACEBO': 'orange'}
+color_mapping = {'FMT': '#40E0D0', 'PLACEBO': '#FF6B4A'}  # Turquoise and orangy red
 
 # Create a plot for each survey on its respective subplot
 for i, survey_name in enumerate(survey_names):
@@ -44,7 +56,7 @@ for i, survey_name in enumerate(survey_names):
 
     # Sum scores per patient, per follow-up, per survey
     patient_scores_over_time = survey_df.groupby(
-        ['patient_number', 'follow_up_number', 'patient_fmt_or_p']
+        ['patient_number', 'months', 'patient_fmt_or_p']
     )['score'].sum().reset_index()
 
     # Plot individual points and calculate statistics for each treatment
@@ -53,7 +65,7 @@ for i, survey_name in enumerate(survey_names):
         
         # Plot individual points
         ax.scatter(
-            treatment_data['follow_up_number'],
+            treatment_data['months'],
             treatment_data['score'],
             color=color_mapping[treatment],
             alpha=0.6,  # Slightly transparent
@@ -61,36 +73,37 @@ for i, survey_name in enumerate(survey_names):
         )
 
         # Calculate statistics for this treatment
-        stats = treatment_data.groupby('follow_up_number')['score'].agg([
+        stats = treatment_data.groupby('months')['score'].agg([
             'mean',
             'std'
         ]).reset_index()
 
         # Plot mean line
-        ax.plot(stats['follow_up_number'], 
+        ax.plot(stats['months'], 
                 stats['mean'], 
                 color=color_mapping[treatment], 
                 linewidth=2, 
                 label=f'{treatment} Mean')
 
-        # Plot standard deviation range
-        ax.fill_between(stats['follow_up_number'],
+        # Plot standard deviation range in light grey
+        ax.fill_between(stats['months'],
                         stats['mean'] - stats['std'],
                         stats['mean'] + stats['std'],
-                        color=color_mapping[treatment],
-                        alpha=0.2,
+                        color='#D3D3D3',  # Light grey
+                        alpha=0.3,
                         label=f'{treatment} ±1 SD')
 
     ax.set_title(f'Scores for {survey_name}')
     ax.set_ylabel('Total Score')
-    # Ensure all follow-up numbers are shown as ticks
-    ax.set_xticks(sorted(patient_scores_over_time['follow_up_number'].unique()))
+    # Set x-axis ticks every 2 months from 0 to 12
+    ax.set_xticks(np.arange(0, 13, 2))
+    ax.set_xlim(-0.5, 12.5)  # Add small padding on both sides
     
     # Add legend
     ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
 
 # Set common X-axis label on the last subplot
-axes[-1].set_xlabel('Follow Up Number')
+axes[-1].set_xlabel('Months After Treatment')
 
 # Add a main title to the figure
 fig.suptitle('Patient Scores Over Time by Survey and Treatment', fontsize=16)

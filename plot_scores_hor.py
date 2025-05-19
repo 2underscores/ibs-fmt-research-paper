@@ -24,6 +24,18 @@ df['patient_number'] = df['patient_number'].astype(str)
 # Ensure patient_fmt_or_p is string and uppercase for consistent mapping
 df['patient_fmt_or_p'] = df['patient_fmt_or_p'].astype(str).str.upper()
 
+# Create mapping from follow-up number to months
+follow_up_to_months = {
+    0: 0,   # baseline
+    1: 1,   # 1 month
+    2: 3,   # 3 months
+    3: 6,   # 6 months
+    4: 12   # 12 months
+}
+
+# Add months column to dataframe
+df['months'] = df['follow_up_number'].map(follow_up_to_months)
+
 # Filter for only first (0) and last (4) follow-up numbers
 df = df[df['follow_up_number'].isin([0, 4])]
 
@@ -54,50 +66,48 @@ for i, survey_name in enumerate(survey_names):
     survey_df = df[df['survey_name'] == survey_name].copy()
 
     patient_scores_over_time = survey_df.groupby(
-        ['patient_number', 'follow_up_number', 'patient_fmt_or_p']
+        ['patient_number', 'months', 'patient_fmt_or_p']
     )['score'].sum().reset_index()
 
     if patient_scores_over_time.empty:
         ax.set_title(f'{survey_name}\n(No Data for FU 0/4)')
         if i == 0:
             ax.set_ylabel('Total Score')
-        ax.set_xticks([0, 4])
+        ax.set_xticks([0, 12])  # Changed to show 0 and 12 months
         print(f"No data to plot for survey: {survey_name} for follow-ups 0 and 4. Skipping subplot content.")
         continue
 
     sns.lineplot(
         data=patient_scores_over_time,
-        x='follow_up_number',
+        x='months',  # Changed from follow_up_number to months
         y='score',
-        hue='patient_number', # Still use hue for different patient colors
-        style='patient_fmt_or_p', # Use style for FMT/Placebo
+        hue='patient_number',
+        style='patient_fmt_or_p',
         dashes=style_mapping,
         markers=True,
         ax=ax,
-        legend=False # Remove legend
+        legend=False
     )
 
-    ax.margins(0.4) # Add 10% margin to both x and y axes within this subplot
+    ax.margins(0.4)
 
     ax.set_title(f'{survey_name}')
-    ax.set_xticks([0, 4]) # Set x-axis ticks to only 0 and 4
+    ax.set_xticks([0, 12])  # Changed to show 0 and 12 months
     
-    if i == 0: # Only set Y-axis label for the first (leftmost) plot
+    if i == 0:
         ax.set_ylabel('Total Score')
     else:
-        ax.set_ylabel('') # No Y-label for other plots for cleaner look if sharey=False
+        ax.set_ylabel('')
 
-    # Set common X-axis label on the middle plot (or first if less than 3 plots)
     if num_surveys > 1 and i == num_surveys // 2:
-        ax.set_xlabel('Follow Up Number')
+        ax.set_xlabel('Months After Treatment')  # Updated label
     elif num_surveys == 1:
-        ax.set_xlabel('Follow Up Number')
+        ax.set_xlabel('Months After Treatment')  # Updated label
     else:
         ax.set_xlabel('')
 
-
 # Add a main title to the figure
-fig.suptitle('Patient Scores: Start (FU 0) vs. End (FU 4) by Survey', fontsize=16)
+fig.suptitle('Patient Scores: Baseline (0 months) vs. End (12 months) by Survey', fontsize=16)  # Updated title
 
 # Adjust subplot parameters for better spacing and to accommodate suptitle
 fig.subplots_adjust(left=0.07, right=0.97, bottom=0.15, top=0.90, wspace=0.35)
